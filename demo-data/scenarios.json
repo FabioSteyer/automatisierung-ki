@@ -1,0 +1,96 @@
+{
+  "scenarios": [
+    {
+      "id": "ausschreibungsautomation",
+      "synthetic": true,
+      "status": "Früherer betrieblicher Einsatz",
+      "problem": "Ein künstliches Leistungsverzeichnis soll ohne reale Artikel- oder Preisdaten nachvollziehbar vorbereitet werden.",
+      "steps": [
+        { "id": "positionen", "label": "Positionen erfassen" },
+        { "id": "preise", "label": "Preisdaten auslesen" },
+        { "id": "vorbereiten", "label": "KI-gestützt vorbereiten" },
+        { "id": "ausnahmen", "label": "Ausnahmen prüfen" },
+        { "id": "freigabe", "label": "Menschlich freigeben" }
+      ],
+      "result": "Ein prüfbarer synthetischer Arbeitsstand.",
+      "limits": ["Keine realen Preise, Ausschreibungen oder Erfolgszahlen."],
+      "externalTools": ["Kommerzielles KI-Werkzeug"]
+    },
+    {
+      "id": "bewerbungs-workflow",
+      "synthetic": true,
+      "status": "Eigenanwendung",
+      "problem": "Eine erfundene Stellenanzeige soll gegen ein synthetisches Profil geprüft werden.",
+      "steps": [
+        { "id": "radar", "label": "Stellenradar" },
+        { "id": "fit", "label": "Volltext und Fit prüfen" },
+        { "id": "unterlagen", "label": "Unterlagen anpassen" },
+        { "id": "qualitaet", "label": "Qualität kontrollieren" },
+        { "id": "freigabe", "label": "Persönlich freigeben" }
+      ],
+      "result": "Ein nachvollziehbares synthetisches Bewerbungspaket.",
+      "limits": ["Keine automatische Einreichung und keine ATS-Garantie."],
+      "externalTools": []
+    },
+    {
+      "id": "webauftritt-ki",
+      "synthetic": true,
+      "status": "Frühere Website",
+      "problem": "Eine öffentliche frühere Portfolio-Website soll als Orchestrierungsbeleg verständlich gezeigt werden.",
+      "steps": [
+        { "id": "einstieg", "label": "Animierter Einstieg" },
+        { "id": "projekt", "label": "Projektansicht" },
+        { "id": "vergleich", "label": "Interaktiver Vergleich" }
+      ],
+      "result": "Eine lokale Bildfolge der früheren öffentlichen Website.",
+      "limits": ["Keine Behauptung alleiniger Programmierung."],
+      "externalTools": ["KI-gestützte Entwicklungswerkzeuge"]
+    },
+    {
+      "id": "automatisierung-wirtschaftlichkeit",
+      "synthetic": true,
+      "status": "Analyse",
+      "problem": "Ein Preisabweichungsverdacht soll mit künstlichen Dokumenten auf Belastbarkeit und Wirtschaftlichkeit geprüft werden.",
+      "steps": [
+        { "id": "verdacht", "label": "Verdacht formulieren" },
+        { "id": "dokumente", "label": "Dokumente prüfen" },
+        { "id": "zuordnung", "label": "Zuordnung bewerten" },
+        { "id": "stopp", "label": "Bewusst stoppen" }
+      ],
+      "result": "Eine begründete Stoppschwelle mit wiederverwendbarem Datenbaustein.",
+      "limits": ["Keine Falschabrechnung oder Rückerstattung behaupten."],
+      "externalTools": []
+    },
+    {
+      "id": "wissensarbeit-ki",
+      "synthetic": true,
+      "status": "Eigenanwendung",
+      "problem": "Zwei erfundene Projekte sollen denselben Wissensbestand sicher fortschreiben.",
+      "steps": [
+        { "id": "bereiche", "label": "Bereiche trennen" },
+        { "id": "stand", "label": "Stand prüfen" },
+        { "id": "schreiben", "label": "Kontrolliert übernehmen" },
+        { "id": "naechste", "label": "Aktuell neu starten" }
+      ],
+      "result": "Getrennte Änderungen und verifizierte Wissensfortschreibung.",
+      "limits": ["Keine universelle Mehrnutzer- oder Ausfallsicherheitsaussage."],
+      "externalTools": ["Kooperierende KI-Werkzeuge"]
+    },
+    {
+      "id": "sprachlernwerkzeug",
+      "synthetic": true,
+      "status": "Prototyp",
+      "problem": "Eine erfundene Übung soll geprüft in einen lokalen Lernstand einfließen.",
+      "steps": [
+        { "id": "ziel", "label": "Lernziel wählen" },
+        { "id": "uebung", "label": "Voice oder Text" },
+        { "id": "pruefung", "label": "Ergebnis prüfen" },
+        { "id": "lernstand", "label": "Lernstand aktualisieren" },
+        { "id": "karten", "label": "Karten bestätigen" }
+      ],
+      "result": "Ein fortgeschriebener synthetischer Lernstand.",
+      "limits": ["Kein messbarer Sprachfortschritt und keine privaten Lerninhalte."],
+      "externalTools": ["Voice-Oberfläche", "Anki"]
+    }
+  ]
+}

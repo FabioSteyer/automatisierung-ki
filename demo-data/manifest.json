@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "syntheticOnly": true,
+  "entries": [
+    {
+      "id": "ausschreibungsautomation",
+      "path": "demo-data/scenarios.json",
+      "sha256": "8b1c5980662d557a2094316e33ef04d733deb9511b1951bffae9e5b416c1f8e3",
+      "steps": ["positionen", "preise", "vorbereiten", "ausnahmen", "freigabe"]
+    },
+    {
+      "id": "bewerbungs-workflow",
+      "path": "demo-data/scenarios.json",
+      "sha256": "8e6c66c1f849b66623d3fe1e19c0c6c56f1e9df4a505c3e19a566b1e79526c52",
+      "steps": ["radar", "fit", "unterlagen", "qualitaet", "freigabe"]
+    },
+    {
+      "id": "webauftritt-ki",
+      "path": "demo-data/scenarios.json",
+      "sha256": "4da6dfa8081358e06855c5f1b34075bd3d53b80797b7c910eee530b70d0bd9f5",
+      "steps": ["einstieg", "projekt", "vergleich"]
+    },
+    {
+      "id": "automatisierung-wirtschaftlichkeit",
+      "path": "demo-data/scenarios.json",
+      "sha256": "7ff45d480eb627111f9ba9bc8bcd5fe3350ede04f1eb87133c2c96cc06976ea9",
+      "steps": ["verdacht", "dokumente", "zuordnung", "stopp"]
+    },
+    {
+      "id": "wissensarbeit-ki",
+      "path": "demo-data/scenarios.json",
+      "sha256": "47d364104667158df1fd3934d26ede01d15134f055d3afed3c97ce346eadea2a",
+      "steps": ["bereiche", "stand", "schreiben", "naechste"]
+    },
+    {
+      "id": "sprachlernwerkzeug",
+      "path": "demo-data/scenarios.json",
+      "sha256": "b2bd39cc7c8d1ff1e8b4a9d3059e71ee0889daa9b2ed097624294b4aeecb466d",
+      "steps": ["ziel", "uebung", "pruefung", "lernstand", "karten"]
+    }
+  ]
+}
