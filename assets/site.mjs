@@ -1038,10 +1038,11 @@ export function initSite({ documentRoot, documentBody, storage, mediaQuery, Inte
 }
 
 if (typeof document !== 'undefined') {
+  try { window.localStorage.removeItem('motion'); } catch { /* Old preference may be unavailable. */ }
   initSite({
     documentRoot: document.documentElement,
     documentBody: document.body,
-    storage: window.localStorage,
+    storage: window.sessionStorage,
     mediaQuery: window.matchMedia('(prefers-reduced-motion: reduce)'),
     IntersectionObserverCtor: window.IntersectionObserver,
     windowObject: window
