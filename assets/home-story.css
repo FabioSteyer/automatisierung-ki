@@ -19,10 +19,16 @@ body[data-home-page] [data-scroll-section] {
 body[data-home-page] .hero,
 body[data-home-page] #angebot,
 body[data-home-page] .scene-principle,
-body[data-home-page] .project-run-intro,
+body[data-home-page] .project-run-intro {
+  min-block-size: clamp(32rem, 72vh, 48rem);
+}
+
+/* Rolle und Kontakt tragen wenig Text: inhaltsnahe Höhe, vertikal zentriert. */
 body[data-home-page] #rolle,
 body[data-home-page] #kontakt {
-  min-block-size: clamp(32rem, 72vh, 48rem);
+  display: grid;
+  min-block-size: clamp(20rem, 48vh, 28rem);
+  align-content: center;
 }
 
 body[data-home-page] .hero,
@@ -126,7 +132,7 @@ body[data-home-page] .project-run-intro > * {
 .project-chapter-copy h3 {
   margin-block: 1rem 1.25rem;
   color: inherit;
-  font-size: clamp(2rem, 4.4vw, 4.5rem);
+  font-size: clamp(2rem, 4vw, 4rem);
   line-height: .98;
   text-wrap: balance;
 }
@@ -166,6 +172,20 @@ body[data-home-page] .project-run-intro > * {
   box-shadow: 0 2rem 5rem color-mix(in srgb, var(--signal-bg) 32%, transparent);
   color: var(--chapter-ink);
   overflow: hidden;
+}
+
+/* Bildunterschrift oben, Prozessinhalt im verbleibenden Raum zentriert. */
+.project-process:not(.project-process-web) {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-process:not(.project-process-web) > .process-caption + * {
+  margin-block-start: auto;
+}
+
+.project-process:not(.project-process-web) > :last-child {
+  margin-block-end: auto;
 }
 
 .project-process::before {
