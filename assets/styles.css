@@ -225,9 +225,9 @@ html[data-motion="reduced"]::view-transition-old(*),html[data-motion="reduced"]:
 @media(min-width:48rem) and (max-width:63.99rem){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:48rem) and (max-height:42rem){main>.eyebrow{margin-block:1.5rem .75rem}main>h1{max-width:22ch;margin-block-end:1rem;font-size:clamp(2.6rem,5.2vw,3.65rem);line-height:1.06}main>.lead{max-width:68ch;margin-block-end:2.5rem;font-size:clamp(1.05rem,1.8vw,1.25rem);line-height:1.45}}
 
-.js[data-motion="full"] [data-reveal]{opacity:0;transform:translateY(.75rem);transition:opacity 780ms ease,transform 780ms ease}
+.js[data-motion="full"] [data-reveal]{opacity:1;transform:translateY(.75rem);transition:transform 780ms ease}
 .js[data-motion="full"] [data-scene]{transition-duration:960ms}
-.js[data-motion="full"] [data-reveal].is-visible{opacity:1;transform:none}
+.js[data-motion="full"] [data-reveal].is-visible{transform:none}
 .js[data-motion="full"] body[data-detail-page] .site-header{animation:detail-header 620ms cubic-bezier(.22,1,.36,1) both}
 .js[data-motion="full"] body[data-detail-page] main>.eyebrow{animation:detail-intro 620ms 60ms cubic-bezier(.22,1,.36,1) both}
 .js[data-motion="full"] body[data-detail-page] main>h1{animation:detail-intro 720ms 110ms cubic-bezier(.22,1,.36,1) both}
