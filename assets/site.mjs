@@ -806,11 +806,11 @@ export function initPortfolioHero(root, { reduced = false, windowObject = global
   if (!reduced && typeof IntersectionObserverCtor === 'function') {
     observer = new IntersectionObserverCtor((entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting || entry.intersectionRatio < 0.25) continue;
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.01) continue;
         runners.get(entry.target)?.();
         observer.unobserve(entry.target);
       }
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.25 });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
     for (const hero of runners.keys()) observer.observe(hero);
   } else if (!reduced) {
     for (const run of runners.values()) run();
@@ -966,11 +966,11 @@ export function initPortfolioShowcase(root, { reduced = false, windowObject = gl
   if (!reduced && typeof IntersectionObserverCtor === 'function') {
     observer = new IntersectionObserverCtor((entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting || entry.intersectionRatio < 0.25) continue;
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.01) continue;
         runners.get(entry.target)?.();
         observer.unobserve(entry.target);
       }
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.25 });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
     for (const demo of runners.keys()) observer.observe(demo);
   } else if (!reduced) {
     for (const run of runners.values()) run();
