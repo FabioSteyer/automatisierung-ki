@@ -1110,6 +1110,10 @@ body[data-home-page] [data-scroll-story][data-story-motion="active"] .project-pr
     min-block-size: 0;
     padding: 1rem;
   }
+  body[data-home-page] [data-scroll-story][data-story-motion="active"] .project-process-tender [data-sequence-step],
+  body[data-home-page] [data-scroll-story][data-story-motion="active"] .project-process-application [data-sequence-step] {
+    transform: translate3d(0, calc((1 - var(--preview-progress, 1)) * .875rem), 0);
+  }
   .portfolio-showcase {
     grid-template-columns: 1fr;
   }
