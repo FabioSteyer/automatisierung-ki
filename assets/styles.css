@@ -1,4 +1,4 @@
-:root{--signal-bg:#181c1f;--signal-panel:#23292d;--signal-path:#419590;--signal-question:#b08a3e;--signal-result:#e3e5e2;--surface:var(--signal-result);--text:var(--signal-bg);--accent:var(--signal-path);--accent-soft:var(--signal-panel);--border:var(--signal-question);--space-1:.5rem;--space-2:.875rem;--space-3:1.25rem;--space-4:2rem;--space-5:3.5rem;--measure:76rem;color-scheme:light;font-family:"Aptos Display","Segoe UI",Arial,sans-serif}
+:root{--signal-bg:#101a3c;--signal-panel:#1a2752;--signal-path:#6d8dff;--signal-question:#ee5a95;--signal-result:#f4f6fb;--surface:var(--signal-result);--text:var(--signal-bg);--accent:var(--signal-path);--accent-soft:var(--signal-panel);--border:var(--signal-question);--space-1:.5rem;--space-2:.875rem;--space-3:1.25rem;--space-4:2rem;--space-5:3.5rem;--measure:76rem;color-scheme:light;font-family:"Aptos Display","Segoe UI",Arial,sans-serif}
 
 *,*::before,*::after{box-sizing:border-box}
 
@@ -1327,3 +1327,6 @@ body:has(> .site-header[data-header="compact"]) { padding-block-start: var(--hea
 .site-header[data-header="compact"] .site-logo { grid-row: auto; block-size: 1.9rem; }
 .site-header[data-header="hidden"] .site-name strong,
 .site-header[data-header="compact"] .site-name strong { align-self: center; }
+
+/* Farbkonzept F1: Schaltfläche in Saphir mit weißer Schrift */
+.button, .scene .button { border-color: #2748d0; background: #2748d0; color: #ffffff; }

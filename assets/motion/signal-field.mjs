@@ -159,8 +159,8 @@ export function initSignalField({ canvas, reduced, windowObject, IntersectionObs
   const uniform = (name) => gl.getUniformLocation(program, name);
   const locations = { resolution: uniform('uResolution'), wave: uniform('uWave'), spot: uniform('uSpot'), order: uniform('uOrder'), lines: uniform('uLines'), calm: uniform('uCalm'), path: uniform('uPath'), accent: uniform('uAccent') };
   const styles = windowObject.getComputedStyle?.(documentObject.documentElement);
-  gl.uniform3fv(locations.path, readColor(styles, '--signal-path', '419590'));
-  gl.uniform3fv(locations.accent, readColor(styles, '--signal-question', 'b08a3e'));
+  gl.uniform3fv(locations.path, readColor(styles, '--signal-path', '6d8dff'));
+  gl.uniform3fv(locations.accent, readColor(styles, '--signal-question', 'ee5a95'));
   gl.clearColor(0, 0, 0, 0);
 
   const guard = createPerfGuard();

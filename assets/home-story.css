@@ -748,18 +748,18 @@ body[data-home-page] .project-run-intro > * {
   outline-offset: 2px;
 }
 
-.project-chapter-tender { --chapter-surface: #181c1f; --chapter-ink: #e3e5e2; }
-.project-chapter-application { --chapter-surface: #e3e5e2; --chapter-ink: #181c1f; }
-.project-chapter-web { --chapter-surface: #23292d; --chapter-ink: #e3e5e2; }
-.project-chapter-decision { --chapter-surface: #e3e5e2; --chapter-ink: #181c1f; --chapter-accent: #b08a3e; }
-.project-chapter-knowledge { --chapter-surface: #181c1f; --chapter-ink: #e3e5e2; }
-.project-chapter-language { --chapter-surface: #e3e5e2; --chapter-ink: #181c1f; }
+.project-chapter-tender { --chapter-surface: #101a3c; --chapter-ink: #f4f6fb; }
+.project-chapter-application { --chapter-surface: #f4f6fb; --chapter-ink: #101a3c; }
+.project-chapter-web { --chapter-surface: #1a2752; --chapter-ink: #f4f6fb; }
+.project-chapter-decision { --chapter-surface: #f4f6fb; --chapter-ink: #101a3c; --chapter-accent: #ee5a95; }
+.project-chapter-knowledge { --chapter-surface: #101a3c; --chapter-ink: #f4f6fb; }
+.project-chapter-language { --chapter-surface: #f4f6fb; --chapter-ink: #101a3c; }
 
 /* Ausgewählte Richtung für Projekt 3: eine gemeinsame redaktionelle Evidenzbühne. */
 .project-chapter-web[data-selected-design="editorial-evidence-stage"] {
-  --chapter-surface: #181c1f;
-  --chapter-ink: #e3e5e2;
-  --chapter-accent: #419590;
+  --chapter-surface: #101a3c;
+  --chapter-ink: #f4f6fb;
+  --chapter-accent: #6d8dff;
 }
 
 .project-chapter-web[data-selected-design="editorial-evidence-stage"] .project-process-web {
