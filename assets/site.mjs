@@ -1,3 +1,6 @@
+import { initMotionCore } from './motion/core.mjs';
+import { initSignalField } from './motion/signal-field.mjs';
+
 export function resolveMotionPreference(stored, systemReduced) {
   if (stored === 'reduced' || stored === 'full') return stored;
   return systemReduced ? 'reduced' : 'full';
@@ -449,9 +452,34 @@ export function computeSequenceStepProgress(progress, index, count = 1) {
   return clampStoryProgress((Number(progress || 0) - start) / 0.62);
 }
 
-export function computePreviewProgress(elementTop, viewportHeight) {
-  const height = Math.max(Number(viewportHeight) || 0, 1);
-  return clampStoryProgress((height * 0.96 - Number(elementTop || 0)) / (height * 1.25));
+// Scroll-bound motion starts when an element enters at the lower edge and is complete
+// when the element's centre reaches the centre of the screen. Elements taller than the
+// screen finish once their top sits just below the header; elements that can never
+// scroll that far (end of page) finish at the last reachable position instead.
+export function computeCenteredProgress(elementTop, elementHeight, viewportHeight, lowestReachableTop = Number.NEGATIVE_INFINITY) {
+  const viewport = Math.max(Number(viewportHeight) || 0, 1);
+  const size = Math.max(Number(elementHeight) || 0, 0);
+  let end = Math.max((viewport - size) / 2, viewport * 0.12);
+  if (Number.isFinite(lowestReachableTop)) end = Math.max(end, lowestReachableTop);
+  const travel = Math.max(viewport * 0.96 - end, viewport * 0.1);
+  return clampStoryProgress((end + travel - Number(elementTop || 0)) / travel);
+}
+
+export function computePreviewProgress(elementTop, viewportHeight, elementHeight = 0, lowestReachableTop = Number.NEGATIVE_INFINITY) {
+  return computeCenteredProgress(elementTop, elementHeight, viewportHeight, lowestReachableTop);
+}
+
+// A scan line runs from the top of its graphic to the bottom edge. A graphic that fits the
+// screen is fully scanned when its centre reaches the centre of the screen; a taller one
+// when its bottom edge reaches the centre. The scan starts when the line itself (scanOffset
+// below the top of the graphic) enters at the lower edge, so the line stays in view the whole way.
+export function computeScanProgress(elementTop, elementHeight, viewportHeight, lowestReachableTop = Number.NEGATIVE_INFINITY, scanOffset = 0) {
+  const viewport = Math.max(Number(viewportHeight) || 0, 1);
+  const size = Math.max(Number(elementHeight) || 0, 0);
+  let end = size <= viewport ? (viewport - size) / 2 : viewport / 2 - size;
+  if (Number.isFinite(lowestReachableTop)) end = Math.max(end, lowestReachableTop);
+  const travel = Math.max(viewport * 0.96 - Math.max(Number(scanOffset) || 0, 0) - end, viewport * 0.1);
+  return clampStoryProgress((end + travel - Number(elementTop || 0)) / travel);
 }
 
 export function advanceSequenceProgress(start, target, elapsedMs, visible, durationMs = 260) {
@@ -520,6 +548,7 @@ export function initScrollStory({ root, reduced, windowObject }) {
       sequence.style.removeProperty('--preview-progress');
       const portfolioHero = sequence.querySelector('[data-portfolio-hero]');
       portfolioHero?.style.removeProperty('--portfolio-progress');
+      portfolioHero?.style.removeProperty('--portfolio-scan-travel');
       for (const documentTile of sequence.querySelectorAll('[data-portfolio-document]')) documentTile.style.removeProperty('--document-progress');
       for (const step of sequence.querySelectorAll('[data-sequence-step]')) {
         for (const property of ['--step-progress', '--step-opacity', '--step-shift', '--step-scale']) step.style.removeProperty(property);
@@ -544,20 +573,26 @@ export function initScrollStory({ root, reduced, windowObject }) {
     const maximumScroll = Math.max((documentElement?.scrollHeight || 0) - viewportHeight, 1);
     const trackProgress = clampStoryProgress((windowObject.scrollY || 0) / maximumScroll);
     const sectionReads = sections.map((section, index) => ({ section, index, progress: computeStoryProgress(section.getBoundingClientRect().top, viewportHeight) }));
+    const remainingScroll = Math.max(maximumScroll - (windowObject.scrollY || 0), 0);
     const contentReads = content.map((element) => {
-      const rectTop = element.getBoundingClientRect().top;
-      const untranslatedTop = removeStoryTranslation(rectTop, element.style.getPropertyValue('--story-content-y'));
+      const rect = element.getBoundingClientRect();
+      const untranslatedTop = removeStoryTranslation(rect.top, element.style.getPropertyValue('--story-content-y'));
       return {
         element,
-        progress: computeStoryProgress(untranslatedTop, viewportHeight),
+        progress: computeCenteredProgress(untranslatedTop, rect.height, viewportHeight, untranslatedTop - remainingScroll),
         drifts: element.matches('.card-grid > *:nth-child(even), .process-flow > *:nth-child(even)')
       };
     });
     let sequenceNeedsFrame = false;
     const sequenceReads = sequences.map((sequence) => {
-      const motionElement = sequence.querySelector('.chapter-sequence') ?? sequence;
+      const scanHero = sequence.querySelector('[data-portfolio-hero]');
+      const motionElement = scanHero ?? sequence.querySelector('.chapter-sequence') ?? sequence;
       const motionRect = motionElement.getBoundingClientRect();
-      const target = computePreviewProgress(motionRect.top, viewportHeight);
+      const scanWall = scanHero?.querySelector('.portfolio-document-wall');
+      const scanTravel = scanWall ? Math.max(motionRect.bottom - scanWall.getBoundingClientRect().top - 3, 0) : null;
+      const target = scanHero
+        ? computeScanProgress(motionRect.top, motionRect.height, viewportHeight, motionRect.top - remainingScroll, scanTravel == null ? 0 : motionRect.height - scanTravel - 3)
+        : computePreviewProgress(motionRect.top, viewportHeight, motionRect.height, motionRect.top - remainingScroll);
       const visible = motionRect.top < viewportHeight && motionRect.bottom > 0;
       const state = sequenceStates.get(sequence);
 
@@ -595,7 +630,9 @@ export function initScrollStory({ root, reduced, windowObject }) {
         sequence,
         progress: state.rendered,
         steps: [...sequence.querySelectorAll('[data-sequence-step]')],
-        portfolioHero: sequence.querySelector('[data-portfolio-hero]'),
+        portfolioHero: scanHero,
+        scanTravel,
+        replaying: scanHero?.dataset.portfolioPhase === 'running',
         portfolioDocuments: [...sequence.querySelectorAll('[data-portfolio-document]')]
       };
     });
@@ -636,7 +673,9 @@ export function initScrollStory({ root, reduced, windowObject }) {
       element.style.setProperty('--story-content-x', `${(drifts ? -24 * (1 - progress) : 0).toFixed(3)}px`);
       element.style.setProperty('--story-content-y', `${(drifts ? 0 : 32 * (1 - progress)).toFixed(3)}px`);
     }
-    for (const { sequence, progress, steps, portfolioHero, portfolioDocuments } of sequenceReads) {
+    for (const { sequence, progress, steps, portfolioHero, scanTravel, replaying, portfolioDocuments } of sequenceReads) {
+      if (portfolioHero && scanTravel != null) portfolioHero.style.setProperty('--portfolio-scan-travel', `${scanTravel.toFixed(1)}px`);
+      if (replaying) continue;
       sequence.style.setProperty('--preview-progress', progress.toFixed(4));
       steps.forEach((step, index) => {
         const stepProgress = computeSequenceStepProgress(progress, index, steps.length);
@@ -795,7 +834,11 @@ export function initPortfolioHero(root, { reduced = false, windowObject = global
     setFilter(hero.dataset.documentFilter);
     if (reduced) finish();
     else hero.dataset.portfolioPhase = 'complete';
-    if (!reduced) runners.set(hero, run);
+    // Inside the scroll story the scan follows the scroll position; first sight only counts the run.
+    // The replay button still plays the timed pass.
+    const scrollBound = Boolean(hero.closest?.('[data-scroll-story]'));
+    const markSeen = () => { hero.dataset.portfolioRun = String(Number(hero.dataset.portfolioRun || 0) + 1); };
+    if (!reduced) runners.set(hero, scrollBound ? markSeen : run);
     cleanups.push(() => {
       stopped = true;
       if (timer != null) windowObject.clearTimeout(timer);
@@ -1000,8 +1043,111 @@ function updateButton(button, value) {
   button.textContent = reduced ? 'Bewegung: reduziert' : 'Bewegung: vollständig';
 }
 
+export function shouldShowToTop(scrollY, viewportHeight) {
+  return (Number(scrollY) || 0) > Math.max(Number(viewportHeight) || 0, 1) * 0.6;
+}
+
+// The link works without scripting (it is a plain "#top" link and then always visible).
+// With scripting it stays out of the way until the reader has left the first screen.
+export function initToTop({ documentBody, windowObject }) {
+  const link = documentBody.querySelector?.('[data-to-top]');
+  if (!link || !windowObject?.addEventListener) return { disconnect() {} };
+  const update = () => {
+    const state = shouldShowToTop(windowObject.scrollY, windowObject.innerHeight) ? 'shown' : 'hidden';
+    if (link.dataset.toTop !== state) link.dataset.toTop = state;
+  };
+  const onClick = () => {
+    documentBody.querySelector('.site-name')?.focus?.({ preventScroll: true });
+  };
+  windowObject.addEventListener('scroll', update, { passive: true });
+  windowObject.addEventListener('resize', update, { passive: true });
+  link.addEventListener('click', onClick);
+  update();
+  return {
+    disconnect() {
+      windowObject.removeEventListener('scroll', update);
+      windowObject.removeEventListener('resize', update);
+      link.removeEventListener('click', onClick);
+    }
+  };
+}
+
+// Header states: "top" (the full header in the page flow), "hidden" (slim bar moved out while
+// reading downwards) and "compact" (slim bar back in view as soon as the reader scrolls up).
+export function resolveHeaderState(previous, scrollY, lastY, leaveAt, tolerance = 6) {
+  const y = Number(scrollY) || 0;
+  if (previous === 'top' || !previous) return y > leaveAt ? 'hidden' : 'top';
+  if (y <= 4) return 'top';
+  if (y > lastY + tolerance) return 'hidden';
+  if (y < lastY - tolerance) return 'compact';
+  return previous;
+}
+
+export function initHeader({ documentBody, windowObject }) {
+  const header = documentBody.querySelector?.('.site-header');
+  if (!header?.dataset || !documentBody.style?.setProperty || !windowObject?.addEventListener || !windowObject.getComputedStyle) return { disconnect() {} };
+  let state = 'top';
+  let lastY = windowObject.scrollY || 0;
+  let leaveAt = 0;
+  let jumpFrame = 0;
+
+  const measure = () => {
+    const previous = header.dataset.header;
+    header.dataset.header = 'top';
+    const styles = windowObject.getComputedStyle(header);
+    const space = header.offsetHeight + (Number.parseFloat(styles.marginTop) || 0) + (Number.parseFloat(styles.marginBottom) || 0);
+    documentBody.style.setProperty('--header-space', `${space.toFixed(2)}px`);
+    leaveAt = space + 24;
+    if (previous) header.dataset.header = previous;
+  };
+
+  const apply = (next) => {
+    if (next === state) return;
+    if (state === 'top' || next === 'top') {
+      // Swapping between the flow header and the fixed bar must not slide: the swap happens out of view.
+      header.dataset.headerJump = '';
+      if (jumpFrame) windowObject.cancelAnimationFrame?.(jumpFrame);
+      jumpFrame = windowObject.requestAnimationFrame?.(() => {
+        jumpFrame = windowObject.requestAnimationFrame?.(() => { jumpFrame = 0; delete header.dataset.headerJump; }) ?? 0;
+      }) ?? 0;
+      if (!jumpFrame) delete header.dataset.headerJump;
+    }
+    state = next;
+    header.dataset.header = next;
+  };
+
+  const onScroll = () => {
+    const y = windowObject.scrollY || 0;
+    const next = resolveHeaderState(state, y, lastY, leaveAt);
+    if (Math.abs(y - lastY) > 6 || next !== state) lastY = y;
+    apply(next);
+  };
+  const onFocus = () => { if (state === 'hidden') apply('compact'); };
+  const onResize = () => { measure(); onScroll(); };
+
+  measure();
+  header.dataset.header = 'top';
+  onScroll();
+  windowObject.addEventListener('scroll', onScroll, { passive: true });
+  windowObject.addEventListener('resize', onResize, { passive: true });
+  header.addEventListener('focusin', onFocus);
+  return {
+    disconnect() {
+      windowObject.removeEventListener('scroll', onScroll);
+      windowObject.removeEventListener('resize', onResize);
+      header.removeEventListener('focusin', onFocus);
+      if (jumpFrame) windowObject.cancelAnimationFrame?.(jumpFrame);
+      delete header.dataset.header;
+      delete header.dataset.headerJump;
+      documentBody.style.removeProperty('--header-space');
+    }
+  };
+}
+
 export function initSite({ documentRoot, documentBody, storage, mediaQuery, IntersectionObserverCtor, windowObject }) {
   documentRoot.classList.add('js');
+  const toTop = initToTop({ documentBody, windowObject });
+  const header = initHeader({ documentBody, windowObject });
   let value = resolveMotionPreference(readStoredMotion(storage), mediaQuery.matches);
   applyMotionPreference(documentRoot, value);
   const button = documentBody.querySelector('[data-motion-toggle]');
@@ -1013,6 +1159,8 @@ export function initSite({ documentRoot, documentBody, storage, mediaQuery, Inte
   let cases = initKnowledgeCase(documentBody, { reduced: value === 'reduced' });
   let portfolioHero = initPortfolioHero(documentBody, { reduced: value === 'reduced', windowObject, IntersectionObserverCtor });
   let portfolio = initPortfolioShowcase(documentBody, { reduced: value === 'reduced', windowObject, IntersectionObserverCtor });
+  let field = initSignalField({ canvas: documentBody.querySelector('[data-signal-field]'), reduced: value === 'reduced', windowObject, IntersectionObserverCtor });
+  let motion = initMotionCore({ documentRoot, windowObject, reduced: value === 'reduced' });
 
   button?.addEventListener('click', () => {
     value = toggleMotionPreference(value);
@@ -1033,8 +1181,12 @@ export function initSite({ documentRoot, documentBody, storage, mediaQuery, Inte
     portfolioHero = initPortfolioHero(documentBody, { reduced: value === 'reduced', windowObject, IntersectionObserverCtor });
     portfolio.disconnect();
     portfolio = initPortfolioShowcase(documentBody, { reduced: value === 'reduced', windowObject, IntersectionObserverCtor });
+    motion.disconnect();
+    motion = initMotionCore({ documentRoot, windowObject, reduced: value === 'reduced' });
+    field.disconnect();
+    field = initSignalField({ canvas: documentBody.querySelector('[data-signal-field]'), reduced: value === 'reduced', windowObject, IntersectionObserverCtor });
   });
-  return { disconnect: () => { reveal.disconnect(); flows.disconnect(); previews.disconnect(); story.disconnect(); cases.disconnect(); portfolioHero.disconnect(); portfolio.disconnect(); } };
+  return { disconnect: () => { reveal.disconnect(); flows.disconnect(); previews.disconnect(); story.disconnect(); cases.disconnect(); portfolioHero.disconnect(); portfolio.disconnect(); field.disconnect(); motion.disconnect(); toTop.disconnect(); header.disconnect(); } };
 }
 
 if (typeof document !== 'undefined') {

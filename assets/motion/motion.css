@@ -1,0 +1,2 @@
+.signal-field{position:absolute;inset-block-start:0;inset-inline-start:0;inline-size:100%;block-size:var(--signal-extent,100svh);z-index:-1;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,black 68%,transparent);mask-image:linear-gradient(to bottom,black 68%,transparent)}
+.signal-field~main .hero{background-color:transparent}
